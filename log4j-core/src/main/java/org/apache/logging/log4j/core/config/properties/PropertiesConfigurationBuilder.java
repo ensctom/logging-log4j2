@@ -162,14 +162,15 @@ public class PropertiesConfigurationBuilder extends ConfigurationBuilderFactory
 
         final String loggerProp = rootProperties.getProperty("loggers");
         if (loggerProp != null) {
-            final String[] loggerNames = loggerProp.split(",");
-            for (final String loggerName : loggerNames) {
-                final String name = loggerName.trim();
+            SortedMap<String,String> sortedMap = new TreeMap(Collections.reverseOrder());
+            Stream.of(loggerProp.split(",")).forEach(e -> sortedMap.put(e,e));
+            sortedMap.entrySet().forEach(entry -> {
+                final String name = entry.getKey().trim()
                 if (!name.equals(LoggerConfig.ROOT)) {
                     builder.add(createLogger(name, PropertiesUtil.extractSubset(rootProperties, "logger." +
                             name)));
                 }
-            }
+            });
         } else {
 
             final Map<String, Properties> loggers = PropertiesUtil
